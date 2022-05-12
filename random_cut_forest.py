@@ -9,24 +9,24 @@ data_path_list = ['data/Media/Media_INFO.csv', 'data/Media/Media_LOGIN.csv', 'da
 # Generate data
 df_list = []
 for p in data_path_list:
-    data = pd.read_csv('./dataset/dataset/' + p)
+    data = pd.read_csv('./' + p)
     df_list.append(data)
 
 idx_half = df_list[0].index[df_list[0]['Timestamp'] == '20171231_2355-0000'].tolist()[0]
 handworkdf = {}
 handworkdf['Timestamp'] = df_list[0]['Timestamp']
-handworkdf['INFO_Success'] = df_list[0]['INFO-01-Success']
+#handworkdf['INFO_Success'] = df_list[0]['INFO-01-Success']
 handworkdf['INFO_Request'] = df_list[0]['INFO-01-Request']
 
-for j in range(1, 6):
+for j in range(1, 2):
     handworkdf['Timestamp'] = df_list[0]['Timestamp']
-    handworkdf['LOGIN_Success_' + str(j)] = df_list[1]['LOGIN-0'+str(j)+'-Success']
+    #handworkdf['LOGIN_Success_' + str(j)] = df_list[1]['LOGIN-0'+str(j)+'-Success']
     handworkdf['LOGIN_Request_' + str(j)] = df_list[1]['LOGIN-0'+str(j)+'-Request']
     handworkdf['LOGIN_Fail_' + str(j)] = df_list[1]['LOGIN-0'+str(j)+'-Fail']
 
-for j in range(1, 5):
+for j in range(1, 2):
     handworkdf['Timestamp'] = df_list[0]['Timestamp']
-    handworkdf['MENU_Success_' + str(j)] = df_list[2]['MENU-0'+str(j)+'-Success']
+    #handworkdf['MENU_Success_' + str(j)] = df_list[2]['MENU-0'+str(j)+'-Success']
     handworkdf['MENU_Request_' + str(j)] = df_list[2]['MENU-0'+str(j)+'-Request']
     handworkdf['MENU_Fail_' + str(j)] = df_list[2]['MENU-0'+str(j)+'-Fail']
 
@@ -40,12 +40,12 @@ for key in handworkdf.keys():
     if key != 'Timestamp':
         print(key)
         d = np.array(handworkdf[key])
+        d = d[idx_half + 1:]
         d = d[np.isfinite(d)]
-        #sin = d[idx_half: idx_half + 105120]
-        sin = d[idx_half: idx_half + 105120]
+        sin = d
         # Set tree parameters
-        num_trees = 200
-        shingle_size = 48
+        num_trees = 40
+        shingle_size = 4
         tree_size = 256
 
         # Create a forest of empty trees
@@ -84,7 +84,7 @@ for key in handworkdf.keys():
 
         y = avg_codisp.values()
         score = pd.DataFrame(y, columns=['score'])
-        score.to_csv('./figure/score_' +str(num_trees) + '_' + str(shingle_size) + '_' + key + '.png')
+        score.to_csv('./figure/score_' +str(num_trees) + '_' + str(shingle_size) + '_' + key + '.csv')
         x = np.array(list(range(0, len(y))))
         
         plt.plot(x, y, 'r')
